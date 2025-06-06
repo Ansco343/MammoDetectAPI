@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from datetime import datetime
 import os
+import gdown
 import io
 from io import BytesIO
 import base64
@@ -38,9 +39,21 @@ def prepare_image_classify(img, target_size=(256, 256)):
 
 #fungsi klasifikasi
 def classify_image(img):
+    CLASS_MODEL_DIR = os.path.join(os.path.dirname(__file__), "model")
+    CLASS_MODEL_NAME = "predict_realFakemix(100 epoch weighted).keras"
+    CLASS_MODEL_PATH = os.path.join(CLASS_MODEL_DIR, CLASS_MODEL_NAME)
+
+    # Google Drive file ID from your link
+    GDRIVE_FILE_ID = "13wFTPGWNh-YcnGU1MR5l_8Ygk_4BH2iq"
+    GDRIVE_URL = f"https://drive.google.com/uc?id={GDRIVE_FILE_ID}"
+
+    if not os.path.exists(CLASS_MODEL_PATH):
+        os.makedirs(CLASS_MODEL_DIR, exist_ok=True)
+        print("Model not found. Downloading from Google Drive...")
+        gdown.download(GDRIVE_URL, CLASS_MODEL_PATH, quiet=False)
+
     # Load model
-    MODEL_PATH = os.path.join(os.path.dirname(__file__), "model", "predict_realFakemix(100 epoch weighted).keras")
-    modelClassify = keras.models.load_model(MODEL_PATH, compile=False)
+    modelClassify = keras.models.load_model(CLASS_MODEL_PATH, compile=False)
 
     # Kelas output dari model
     class_names = ["Normal", "Benign", "Malignant"]
@@ -70,12 +83,22 @@ def get_transform_single_image():
 #fungsi segmentasi
 def segmentation(img, score_threshold=0.5):
     # Load model
-    model_path = os.path.join(os.path.dirname(__file__), "model", "segmentation(512, filter kalsif -25%).pth")
+    SEG_MODEL_DIR = os.path.join(os.path.dirname(__file__), "model")
+    SEG_MODEL_NAME = "segmentation(512, filter kalsif -25%).pth"
+    SEG_MODEL_PATH = os.path.join(SEG_MODEL_DIR, SEG_MODEL_NAME)
+
+    SEG_MODEL_ID = "1ADYlp-ZlmYY69lNSPR5SDc7ejLxRRkIQ"
+    SEG_MODEL_URL = f"https://drive.google.com/uc?id={SEG_MODEL_ID}"
+
+    if not os.path.exists(SEG_MODEL_PATH):
+        print("Downloading segmentation model...")
+        gdown.download(SEG_MODEL_URL, SEG_MODEL_PATH, quiet=False)
+
     # num_classes = 3 # Background, Kanker, Kalsifikasi
     labels_map = {0: 'Background', 1: 'Kanker', 2: 'Kalsifikasi'} # Pastikan ini sesuai
 
     loaded_model = segment_base_model
-    loaded_model.load_state_dict(torch.load(model_path, map_location=device))
+    loaded_model.load_state_dict(torch.load(SEG_MODEL_PATH, map_location=device))
     loaded_model.to(device)
     loaded_model.eval()
 
