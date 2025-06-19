@@ -21,7 +21,7 @@ import base64
 app = Flask(__name__)
 
 #device setup
-device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+device = torch.device('cpu')
 
 # Persiapkan direktori upload
 UPLOAD_FOLDER = "uploads"
@@ -204,6 +204,8 @@ def predict():
         return jsonify({'error': 'Empty filename'}), 400
 
     img = Image.open(file.stream)
+    file.stream.close() # Close the stream explicitly
+    del file # Delete the file object
 
     # Panggil fungsi klasifikasi terpisah
     label, confidenceClasify, _ = classify_image(img)
