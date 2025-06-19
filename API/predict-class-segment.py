@@ -203,16 +203,19 @@ def predict():
     if file.filename == '':
         return jsonify({'error': 'Empty filename'}), 400
 
-    img = Image.open(file.stream)
-    file.stream.close() # Close the stream explicitly
-    del file # Delete the file object
+    image_stream_data = file.read()
+    file.close()
+    
+    img = Image.open(BytesIO(image_stream_data))
+    # file.stream.close() # Close the stream explicitly
+    # del file # Delete the file object
 
     # Panggil fungsi klasifikasi terpisah
-    label, confidenceClasify, _ = classify_image(img)
+    label, confidenceClasify, _ = classify_image(img.copy())
 
     # if not normal do segmentation
     if label == "Benign" or label == "Malignant":
-        segmented_img, avg_confidence = segmentation(img, score_threshold=0.5)
+        segmented_img, avg_confidence = segmentation(img.copy(), score_threshold=0.5)
 
         if avg_confidence:
             confidenceSegment = avg_confidence
