@@ -56,7 +56,7 @@ def classify_image(img):
     modelClassify = keras.models.load_model(CLASS_MODEL_PATH, compile=False)
 
     # Kelas output dari model
-    class_names = ["Normal", "Benign", "Malignant"]
+    class_names = ["Normal", "Benign (Jinak)", "Malignant (Ganas)"]
 
     """Melakukan klasifikasi pada gambar dan mengembalikan label, confidence, dan array prediksi."""
     img_array = prepare_image_classify(img)
