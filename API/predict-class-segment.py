@@ -214,7 +214,7 @@ def predict():
     label, confidenceClasify, _ = classify_image(img.copy())
 
     # if not normal do segmentation
-    if label == "Benign" or label == "Malignant":
+    if label == "Benign (Jinak)" or label == "Malignant (Ganas)":
         segmented_img, avg_confidence = segmentation(img.copy(), score_threshold=0.5)
 
         if avg_confidence:
